@@ -25,3 +25,18 @@ manager，可以统计在线会员信息，引入refresh token manager 可以解
       jwt:
         permitEndpoints: "/swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**"
 ```
+
+###### 基本配置参数
+```yaml
+security:
+  jwt: # 设置jwt 相关的参数
+    tokenExpirationTime: 30 # 分钟
+    refreshTokenExpTime: 14400 # 分钟  10 days
+    refreshTokenReuse: false #设置为false，可以实现用户连续登录，就不需要重新登录认证，否则用户间隔10天，就要重新认证，
+    tokenIssuer: http://www.kabour.online
+    tokenSigningKey: xEV6Hy5R0MFK4EEACID0uQus #换成你自己的密钥
+    annotationPackages: online.kabour #扫描@ApiAuthority(value = ApiAuthority.Type.MEMBER, name = "demo:table:add", description = "添加数据") 的基础路径
+    permitEndpoints: "/swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**" 
+  ajax:
+    enabled: true #是否需要开启 ajax认证模块，如果开启，系统会暴露 token签发 和 refresh token端点
+```
