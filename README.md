@@ -9,7 +9,7 @@ manager，可以统计在线会员信息，引入refresh token manager 可以解
 - 系统级别普通账户、管理员账户认证分离，App客户端、Web客户端认证分离；账号登录连续出错，暂时暂停认证功能
 
 ## 使用注意事项
-######@ApiAuthority注解
+###### @ApiAuthority注解
     
 ```
     //不会添加数据到权限表authority，只会作为权限鉴定使用，说明注解所在api接口为 只要是普通会员都可以访问
@@ -17,7 +17,7 @@ manager，可以统计在线会员信息，引入refresh token manager 可以解
     //会添加数据到权限表authority,表示此api接口，拥有 demo:table:add 权限的会员 才能访问；
     @ApiAuthority(value = ApiAuthority.Type.MEMBER, name = "demo:table:add", description = "添加数据") 
 ```
-######@AuthorizeIgnore注解
+###### @AuthorizeIgnore注解
 ```yaml
     #系统默认访问所有restful接口都要鉴权，若接口不需要鉴权，可以在接口上标注@IgnoreAuthgrize注解即可。
     #还有另外一种方式也可以实现，就是在配置参数里添加ant风格的暴露接口格式，比如：
@@ -26,7 +26,7 @@ manager，可以统计在线会员信息，引入refresh token manager 可以解
         permitEndpoints: "/swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**"
 ```
 
-###### 基本配置参数
+###### 基本参数配置
 ```yaml
 security:
   jwt: # 设置jwt 相关的参数
