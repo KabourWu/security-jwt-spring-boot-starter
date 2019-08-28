@@ -26,10 +26,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -41,58 +39,58 @@ import java.util.Map;
 @RestController
 @ConditionalOnProperty(name = "security.ajax.enabled", havingValue = "true")
 public class RefreshTokenEndpoint {
-	@Autowired
-	private JwtTokenHelper jwtTokenHelper;
-	@Autowired
-	private RefreshTokenManager refreshTokenManager;
-	@Autowired
-	private MyMemberDetailsService myMemberDetailsService;
-	@Autowired
-	private MyAdminDetailsService myAdminDetailsService;
-	@Autowired
-	private JwtSettings jwtSettings;
+    @Autowired
+    private JwtTokenHelper jwtTokenHelper;
+    @Autowired
+    private RefreshTokenManager refreshTokenManager;
+    @Autowired
+    private MyMemberDetailsService myMemberDetailsService;
+    @Autowired
+    private MyAdminDetailsService myAdminDetailsService;
+    @Autowired
+    private JwtSettings jwtSettings;
 
-	@PutMapping(value = JwtWebSecurityConfig.REFRESH_TOKEN_URL, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public Map<String, String> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-		String accessToken = jwtTokenHelper.extract(request.getHeader(JwtWebSecurityConfig.AUTHENTICATION_HEADER_NAME));
+    @PutMapping(value = JwtWebSecurityConfig.REFRESH_TOKEN_URL, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Map<String, String> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = jwtTokenHelper.extract(request.getHeader(JwtWebSecurityConfig.AUTHENTICATION_HEADER_NAME));
 
-		Jws<Claims> jws = jwtTokenHelper.parseRefreshToken(accessToken);
+        Jws<Claims> jws = jwtTokenHelper.parseRefreshToken(accessToken);
 
-		LoginRequest.UserType type = jwtTokenHelper.userType(jws);
-		MyUserDetailsService myUserDetailsService;
-		if (type == LoginRequest.UserType.ADMIN) {
-			myUserDetailsService = myAdminDetailsService;
-		} else {
-			myUserDetailsService = myMemberDetailsService;
-		}
+        LoginRequest.UserType type = jwtTokenHelper.userType(jws);
+        MyUserDetailsService myUserDetailsService;
+        if (type == LoginRequest.UserType.ADMIN) {
+            myUserDetailsService = myAdminDetailsService;
+        } else {
+            myUserDetailsService = myMemberDetailsService;
+        }
 
-		String subject = jws.getBody().getSubject();
-		MyUserDetails userDetails = myUserDetailsService.loadMyUserDetailsByUsername(subject);
-		if (userDetails == null) throw new UsernameNotFoundException("User not found: " + subject);
+        String subject = jws.getBody().getSubject();
+        MyUserDetails userDetails = myUserDetailsService.loadUserByUsername(subject);
+        if (userDetails == null) throw new UsernameNotFoundException("User not found: " + subject);
 
-		Collection authorities = userDetails.getAuthorities();
-		if (authorities == null)
-			throw new InsufficientAuthenticationException("MyUserDetails has no roles assigned");
-		UserContext userContext = new UserContext(userDetails.getUsername(), jwtTokenHelper.userType(jws), jwtTokenHelper.agentType(jws), userDetails.getUserBasicDetail(), authorities);
-		//检查 用户是否加入黑名单
-		if (!refreshTokenManager.verify(subject, userContext)) {
-			throw new InvalidRefreshTokenException();
-		}
-		//是否重用 refresh token， 默认重用
-		if (jwtSettings.getRefreshTokenReuse() == null || jwtSettings.getRefreshTokenReuse()) {
-			JwtToken jwtToken = jwtTokenHelper.createAccessJwtToken(userContext);
-			Map<String, String> tokenMap = new LinkedHashMap<>(4);
-			tokenMap.put("token", jwtToken.getToken());
-			tokenMap.put("refreshToken", accessToken);
-			return tokenMap;
-		}
+        Collection authorities = userDetails.getAuthorities();
+        if (authorities == null)
+            throw new InsufficientAuthenticationException("MyUserDetails has no roles assigned");
+        UserContext userContext = new UserContext(userDetails.getUsername(), jwtTokenHelper.userType(jws), jwtTokenHelper.agentType(jws), userDetails.getUserBasicDetail(), authorities);
+        //检查 用户是否加入黑名单
+        if (!refreshTokenManager.verify(subject, userContext)) {
+            throw new InvalidRefreshTokenException();
+        }
+        //是否重用 refresh token， 默认重用
+        if (jwtSettings.getRefreshTokenReuse() == null || jwtSettings.getRefreshTokenReuse()) {
+            JwtToken jwtToken = jwtTokenHelper.createAccessJwtToken(userContext);
+            Map<String, String> tokenMap = new LinkedHashMap<>(4);
+            tokenMap.put("token", jwtToken.getToken());
+            tokenMap.put("refreshToken", accessToken);
+            return tokenMap;
+        }
 
-		return jwtTokenHelper.createTokenPair(userContext);
-	}
+        return jwtTokenHelper.createTokenPair(userContext);
+    }
 
-	@ResponseBody
-	@ExceptionHandler(Exception.class)
-	ResultResponse exceptionHandler(Exception e) {
-		return ResultResponse.failed(e.getMessage(), ErrorCode.INVALID_REFRESH_TOKEN);
-	}
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
+    ResultResponse exceptionHandler(Exception e) {
+        return ResultResponse.failed(e.getMessage(), ErrorCode.INVALID_REFRESH_TOKEN);
+    }
 }
