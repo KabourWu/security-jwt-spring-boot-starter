@@ -103,7 +103,7 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
             throw new AccountExpiredException("User account has expired");
         }
         if (user.getSerialTrialCount() > 0) {
-            userDetailsService.updateMyUserDetailsSerialTrialErrorCountByUsername(user.getUsername(), (byte) 0);
+            userDetailsService.resetMyUserDetailsSerialTrialErrorCount(user.getUsername());
         }
         if (user.getLockedTime() != null) {
             userDetailsService.updateMyUserDetailsLockedTime(user.getUsername(), null);
@@ -119,7 +119,7 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
                         WebUtil.durationTransferToChinese(removalDate.getTime() - now.getTime(), TimeUnit.MILLISECONDS)));
             } else {
                 userDetailsService.updateMyUserDetailsLockedTime(user.getUsername(), null);
-                userDetailsService.updateMyUserDetailsSerialTrialErrorCountByUsername(user.getUsername(), (byte) 0);
+                userDetailsService.resetMyUserDetailsSerialTrialErrorCount(user.getUsername());
             }
         }
     }

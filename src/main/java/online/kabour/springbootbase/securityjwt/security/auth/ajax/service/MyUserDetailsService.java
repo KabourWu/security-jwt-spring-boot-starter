@@ -21,11 +21,11 @@ public interface MyUserDetailsService extends UserDetailsService {
     void updateMyUserDetailsLoginTimeByUsername(String username);
 
     /**
+     * 复位用户的连续出错次数
+     *
      * @param username
-     * @param count    出错数量
-     * @return
      */
-    void updateMyUserDetailsSerialTrialErrorCountByUsername(String username, Byte count);
+    void resetMyUserDetailsSerialTrialErrorCount(String username);
 
     /**
      * 密码错误次数加一
