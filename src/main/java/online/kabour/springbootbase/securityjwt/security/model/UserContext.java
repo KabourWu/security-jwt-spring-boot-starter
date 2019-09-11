@@ -59,18 +59,18 @@ public class UserContext implements Serializable {
 
 	public static class UserBasicDetail implements Serializable {
 
-		private Long identity;
+		private String identity;
 		private String username;
 		private String icon;
 
 		@JsonCreator
-		public UserBasicDetail(Long identity, String username, String icon) {
+		public UserBasicDetail(String identity, String username, String icon) {
 			this.identity = identity;
 			this.username = username;
 			this.icon = icon;
 		}
 
-		public Long getIdentity() {
+		public String getIdentity() {
 			return identity;
 		}
 

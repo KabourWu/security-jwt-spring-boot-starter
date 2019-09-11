@@ -33,22 +33,22 @@ public class PrincipalHelper {
 	}
 
 	/**
-	 * 检查是否是当时人
+	 * 检查是否是当事人
 	 *
 	 * @param principalIdentity
 	 * @return
 	 */
-	public static boolean principalCheck(Long principalIdentity) {
+	public static boolean principalCheck(String principalIdentity) {
 		return Objects.equals(principalIdentity, principalIdentity());
 	}
 
 
 	/**
-	 * 获取登录用户的 唯一表示
+	 * 获取登录用户的 唯一标识
 	 *
 	 * @return
 	 */
-	public static Long principalIdentity() {
+	public static String principalIdentity() {
 		return userBasicDetail() == null ? null : userBasicDetail().getIdentity();
 	}
 
