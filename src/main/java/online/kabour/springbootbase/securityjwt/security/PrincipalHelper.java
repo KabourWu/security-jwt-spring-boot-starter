@@ -4,6 +4,7 @@ import online.kabour.springbootbase.securityjwt.security.auth.JwtAuthenticationT
 import online.kabour.springbootbase.securityjwt.security.auth.ajax.LoginRequest;
 import online.kabour.springbootbase.securityjwt.security.model.UserContext;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -26,6 +27,9 @@ public class PrincipalHelper {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return null;
+        }
+        if (authentication instanceof UsernamePasswordAuthenticationToken) {
+            return new UserContext.UserBasicDetail("test_id", "test", "");
         }
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         UserContext userContext = (UserContext) jwtAuthenticationToken.getPrincipal();
