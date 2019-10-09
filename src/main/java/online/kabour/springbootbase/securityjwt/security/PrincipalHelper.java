@@ -28,8 +28,11 @@ public class PrincipalHelper {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return null;
         }
+        //使用Mock单元测试情况
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            return new UserContext.UserBasicDetail("test_id", "test", "");
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication;
+            String name = usernamePasswordAuthenticationToken.getName();
+            return new UserContext.UserBasicDetail(name, name, "");
         }
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         UserContext userContext = (UserContext) jwtAuthenticationToken.getPrincipal();
