@@ -12,11 +12,10 @@ import online.kabour.springbootbase.securityjwt.security.auth.ajax.tokenmanager.
 import online.kabour.springbootbase.securityjwt.security.auth.ajax.tokenmanager.refreshtoken.RefreshTokenManager;
 import online.kabour.springbootbase.securityjwt.security.auth.jwt.JwtAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -97,15 +96,15 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
 	}
 
 	@Bean
-	@ConditionalOnBean(RedisConnectionFactory.class)
-	RefreshTokenManager redisRefreshTokenManager(RedisConnectionFactory redisConnectionFactory) {
-		return new RedisRefreshTokenManager(redisConnectionFactory);
+	@ConditionalOnClass(name = "org.springframework.data.redis.connection.RedisConnectionFactory")
+	RefreshTokenManager redisRefreshTokenManager() {
+		return new RedisRefreshTokenManager();
 	}
 
 	@Bean
-	@ConditionalOnBean(RedisConnectionFactory.class)
-	AuthTokenManager redisAuthTokenManager(RedisConnectionFactory redisConnectionFactory) {
-		return new RedisAuthTokenManager(redisConnectionFactory);
+	@ConditionalOnClass(name = "org.springframework.data.redis.connection.RedisConnectionFactory")
+	AuthTokenManager redisAuthTokenManager() {
+		return new RedisAuthTokenManager();
 	}
 
 }

@@ -2,7 +2,10 @@ package online.kabour.springbootbase.securityjwt.security.auth.ajax.tokenmanager
 
 import online.kabour.springbootbase.securityjwt.security.config.JwtSettings;
 import online.kabour.springbootbase.securityjwt.security.model.UserContext;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -17,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @author kabour
  * @date 2019/6/20 21:08
  */
-public class RedisRefreshTokenManager implements RefreshTokenManager {
+public class RedisRefreshTokenManager implements RefreshTokenManager, ApplicationContextAware {
 
 	private static final String REFRESH_TOKEN_PACKAGE_NAME = "jwt:refresh-token";
 
@@ -26,13 +29,13 @@ public class RedisRefreshTokenManager implements RefreshTokenManager {
 	@Autowired
 	private JwtSettings jwtSettings;
 
+	private RedisConnectionFactory redisConnectionFactory;
+
 	@Autowired
-	public RedisRefreshTokenManager(RedisConnectionFactory redisConnectionFactory) {
+	public RedisRefreshTokenManager() {
 		this.redisTemplate = new RedisTemplate<>();
 		redisTemplate.setKeySerializer(new StringRedisSerializer());
 		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(UserContext.class));
-		redisTemplate.setConnectionFactory(redisConnectionFactory);
-		redisTemplate.afterPropertiesSet();
 	}
 
 	@Override
@@ -52,5 +55,12 @@ public class RedisRefreshTokenManager implements RefreshTokenManager {
 	public long deleteRefreshTokenBySubject(String subject) {
 		String redisKeyPattern = String.format("%s:%s:%s:%s", REFRESH_TOKEN_PACKAGE_NAME, "*", "*", subject);
 		return redisTemplate.delete(redisTemplate.keys(redisKeyPattern));
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.redisConnectionFactory = applicationContext.getBean(RedisConnectionFactory.class);
+		redisTemplate.setConnectionFactory(redisConnectionFactory);
+		redisTemplate.afterPropertiesSet();
 	}
 }
