@@ -7,6 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author kabour
@@ -22,7 +24,7 @@ public class UserContext implements Serializable {
 
 	@JsonCreator
 	public UserContext(String username, LoginRequest.UserType userType, LoginRequest.AgentType agentType,
-	                   UserBasicDetail userBasicDetail, Collection<GrantedAuthority> authorities) {
+					   UserBasicDetail userBasicDetail, Collection<GrantedAuthority> authorities) {
 		this.username = username;
 		this.userType = userType;
 		this.agentType = agentType;
@@ -62,12 +64,39 @@ public class UserContext implements Serializable {
 		private String identity;
 		private String username;
 		private String icon;
+		private Map<String, Object> extInfoMap;
 
-		@JsonCreator
 		public UserBasicDetail(String identity, String username, String icon) {
 			this.identity = identity;
 			this.username = username;
 			this.icon = icon;
+		}
+
+		@JsonCreator
+		public UserBasicDetail(String identity, String username, String icon, Map<String, Object> extInfoMap) {
+			this.identity = identity;
+			this.username = username;
+			this.icon = icon;
+			this.extInfoMap = extInfoMap;
+		}
+
+		public Map<String, Object> getExtInfoMap() {
+			return extInfoMap;
+		}
+
+		public void setExtInfoMap(Map<String, Object> extInfoMap) {
+			this.extInfoMap = extInfoMap;
+		}
+
+		public void registerExtInfo(String key, Object value) {
+			if (extInfoMap == null) {
+				extInfoMap = new HashMap<>();
+			}
+			extInfoMap.put(key, value);
+		}
+
+		public Object getExtInfo(String key) {
+			return extInfoMap == null ? null : extInfoMap.get(key);
 		}
 
 		public String getIdentity() {
@@ -81,5 +110,6 @@ public class UserContext implements Serializable {
 		public String getUsername() {
 			return username;
 		}
+
 	}
 }
