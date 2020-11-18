@@ -10,6 +10,7 @@ import online.kabour.springbootbase.securityjwt.security.model.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class AjaxAuthenticationProvider implements AuthenticationProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(AjaxAuthenticationProvider.class);
 
+    @Lazy
     @Autowired
     private PasswordEncoder encoder;
 

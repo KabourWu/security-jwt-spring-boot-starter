@@ -10,7 +10,7 @@
     </parent>
     <groupId>online.kabour.springboot-base</groupId>
     <artifactId>security-jwt-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
     <description>自定义的jwt security 认证整合</description>
 
     <properties>
