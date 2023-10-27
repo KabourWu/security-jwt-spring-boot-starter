@@ -11,6 +11,8 @@ import online.kabour.springbootbase.securityjwt.security.auth.ajax.tokenmanager.
 import online.kabour.springbootbase.securityjwt.security.auth.ajax.tokenmanager.refreshtoken.RedisRefreshTokenManager;
 import online.kabour.springbootbase.securityjwt.security.auth.ajax.tokenmanager.refreshtoken.RefreshTokenManager;
 import online.kabour.springbootbase.securityjwt.security.auth.jwt.JwtAuthenticationProvider;
+import online.kabour.springbootbase.securityjwt.security.auth.jwt.JwtTokenAuthenticationProcessingFilter;
+import online.kabour.springbootbase.securityjwt.security.oauth2.MyOAuth2LoginAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,6 +22,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -39,6 +49,12 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
 	private AjaxAuthenticationProvider ajaxAuthenticationProvider;
 	@Autowired
 	private JwtAuthenticationProvider jwtAuthenticationProvider;
+	@Autowired
+	private OAuth2AuthorizationCodeAuthenticationProvider oAuth2AuthorizationCodeAuthenticationProvider;
+	@Autowired
+	private ClientRegistrationRepository clientRegistrationRepository;
+	@Autowired
+	private InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
 
 	protected AjaxLoginProcessingFilter buildAjaxLoginProcessingFilter(String loginEntryPoint) throws Exception {
 		AjaxLoginProcessingFilter filter = new AjaxLoginProcessingFilter(loginEntryPoint, successHandler, failureHandler);
@@ -46,10 +62,16 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
 		return filter;
 	}
 
+	protected OAuth2LoginAuthenticationFilter buildOAuth2LoginAuthenticationFilter() {
+		InMemoryOAuth2AuthorizedClientService inMemoryOAuth2AuthorizedClientService = new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
+		return new MyOAuth2LoginAuthenticationFilter(inMemoryClientRegistrationRepository, inMemoryOAuth2AuthorizedClientService, successHandler, failureHandler);
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) {
 		auth.authenticationProvider(ajaxAuthenticationProvider);
 		auth.authenticationProvider(jwtAuthenticationProvider);
+		auth.authenticationProvider(oAuth2AuthorizationCodeAuthenticationProvider);
 	}
 
 	@Override
@@ -67,6 +89,7 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
 				.addFilterBefore(new CustomCorsFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(buildOAuth2LoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.addFilterBefore(buildAjaxLoginProcessingFilter(AUTHENTICATION_URL), UsernamePasswordAuthenticationFilter.class)
 				.addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(permitAllEndpointList,
 						annotationPermitAllEndpointList, API_ROOT_URL), UsernamePasswordAuthenticationFilter.class);

@@ -19,6 +19,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -48,6 +52,16 @@ public class MyAuthenticationAutoConfigure {
 	@Bean
 	JwtAuthenticationProvider jwtAuthenticationProvider() {
 		return new JwtAuthenticationProvider();
+	}
+
+	@Bean
+	DefaultAuthorizationCodeTokenResponseClient defaultAuthorizationCodeTokenResponseClient() {
+		return new DefaultAuthorizationCodeTokenResponseClient();
+	}
+
+	@Bean
+	OAuth2AuthorizationCodeAuthenticationProvider oAuth2AuthorizationCodeAuthenticationProvider(OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient ) {
+		return new OAuth2AuthorizationCodeAuthenticationProvider(accessTokenResponseClient);
 	}
 
 	@Bean
