@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-online.kabour.springbootbase.securityjwt.security.MyAuthenticationAutoConfigure
+com.eastcom.potevio.rail.securityjwt.security.MyAuthenticationAutoConfigure
