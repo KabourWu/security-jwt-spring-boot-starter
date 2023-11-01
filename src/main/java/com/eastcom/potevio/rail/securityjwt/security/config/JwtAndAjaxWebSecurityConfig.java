@@ -71,6 +71,7 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
         addPermitEndpoint(permitAllEndpointList);
         addMvcPermitEndpoint(annotationPermitAllEndpointList);
 
+        CustomCorsFilter customCorsFilter = new CustomCorsFilter();
         http
                 .csrf().disable() // We don't need CSRF for JWT based authentication
                 .exceptionHandling()
@@ -80,12 +81,14 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new CustomCorsFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildAjaxLoginProcessingFilter(AUTHENTICATION_URL), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(permitAllEndpointList,
                         annotationPermitAllEndpointList, API_ROOT_URL), UsernamePasswordAuthenticationFilter.class);
         if (oAuth2AuthorizationCodeAuthenticationProvider != null) {
-            http.addFilterBefore(buildMyOAuth2LoginAuthenticationFilter(AUTHENTICATION_URL), AjaxLoginProcessingFilter.class);
+            http.addFilterBefore(buildMyOAuth2LoginAuthenticationFilter(AUTHENTICATION_URL), AjaxLoginProcessingFilter.class)
+                    .addFilterBefore(customCorsFilter, MyOAuth2LoginAuthenticationFilter.class);
+        } else {
+            http.addFilterBefore(new CustomCorsFilter(), UsernamePasswordAuthenticationFilter.class);
         }
     }
 
