@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.eastcom.potevio.rail.springboot-base</groupId>
     <artifactId>security-jwt-spring-boot-starter</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <description>自定义的jwt security 认证整合</description>
 
     <properties>

@@ -106,6 +106,13 @@ public abstract class AbstractOAuth2AuthorizationCodeAuthenticationProvider impl
      */
     public abstract JSONObject getUserInfo(String provider, String token);
 
+    /**
+     * 获取单点登录页面跳转url
+     *
+     * @return 页面url
+     */
+    public abstract String getSsoUrl();
+
     @Override
     public boolean supports(Class<?> aClass) {
         return OAuth2AuthenticationToken.class.equals(aClass);
