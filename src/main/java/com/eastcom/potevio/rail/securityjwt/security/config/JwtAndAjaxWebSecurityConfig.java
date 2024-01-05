@@ -99,6 +99,7 @@ public class JwtAndAjaxWebSecurityConfig extends JwtWebSecurityConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(AjaxAuthenticationProvider.class)
     AjaxAuthenticationProvider ajaxAuthenticationProvider() {
         return new AjaxAuthenticationProvider();
     }

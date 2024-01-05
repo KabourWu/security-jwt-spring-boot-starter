@@ -174,7 +174,7 @@ public class JwtTokenHelper {
 			return Jwts.parser().setSigningKey(settings.getTokenSigningKey()).parseClaimsJws(accessToken);
 		} catch (UnsupportedJwtException | MalformedJwtException
 				| IllegalArgumentException | SignatureException | ExpiredJwtException ex) {
-			LOGGER.error("Invalid JWT Token", ex);
+			LOGGER.debug("Invalid JWT Token", ex);
 			throw new InvalidJwtTokenException(ex.getMessage());
 		}
 	}
